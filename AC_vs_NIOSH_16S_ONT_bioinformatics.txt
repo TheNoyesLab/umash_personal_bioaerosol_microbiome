@@ -1,0 +1,1100 @@
+###############################################################################################################
+# Description: Code for the 16S species-level taxonomic classification of the Swine farmers PERSONAL BIOAEROSOL MICROBIOME
+# Goal: To perform basecalling, 16S taxonomic classification of microbial DNA obtained from 140 personal air samples, 16 sampling NC, 4 DNA extraction NC, 4 library prep NC, 2 positive controls
+# ONT Flow cell: r10.4.1  
+# Kit: SQK-16S114.24
+# Reference - 16S barcoding kit (SQK-16S114.24) info: https://community.nanoporetech.com/posts/16s-barcoding-kit-v14-sqk 
+# Reference - epi2me v.1.6.1 software and READ.me: https://github.com/epi2me-labs/wf-16s 
+# Reference - DORADO v1.3.0 software and READ.me: https://github.com/nanoporetech/dorado
+# Reference - emu v3.5.4 software and READ.me: https://github.com/treangenlab/emu
+# Created: 02/06/26
+# Last updated: 11/23/26
+###############################################################################################################
+#
+#
+##
+###
+#### 16S CLASSIFICATION
+###
+##
+#
+# NOTE: I have data from 8 flow cells (24 samples per cell), check lab notebook or excel file (....xlsx) 
+# for details of samples on each flow cell
+# I NEED to create 8 tmux sessions to run the pipeline on each of them simultaneously in node XXX 
+    # Create tmux 
+        tmux new -s FC1 # tmux a -t FC1, to attach
+        "ctrl+b d"
+        tmux new -s FC2
+        "ctrl+b d"        
+        tmux new -s FC3
+        "ctrl+b d"
+        tmux new -s FC4
+        "ctrl+b d"
+        tmux new -s FC5
+        "ctrl+b d"
+        tmux new -s FC6
+        "ctrl+b d"        
+        tmux new -s FC7
+        "ctrl+b d"
+        tmux new -s FC8
+        "ctrl+b d"
+#
+#
+##
+### RUN EPI2ME wf-16S ##########################
+##
+#
+# Run EPI2ME on every tmux session for each Flow cell
+# For FC1
+    tmux a -t FC1
+    module load nextflow
+    # to check version
+    nextflow -version # it should give me version 25.04.6
+    # to check if epi2me is running, access help menu
+    nextflow run epi2me-labs/wf-16s --help 
+    # I need Nextflow v23.10.1 & wf-16s v1.2.0
+    module purge
+    # Loaded the compatible java version for nextflow
+    module load java/openjdk-11.0.2
+    # Added the path were nextflow v23.10.1 executable is located
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    # If this path changes, I can always find it again and change address OR install nextflow v23.10.1 an use the executable 'nextflow' 
+    # Now I can excecute nextflow from PATH variable and I will just force nextflow to run wf-16s v1.2.0 by adding the "-r v1.2.0" parameter.
+    # Move were files are standing
+    cd /scratch.global/diazo005/NN14/NN14_2026-01-22_FBA61501/ 
+    # Run!
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq FC1/20260122_1345_X1_FBA61501_b5fd17f5/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC1.log 2>&1 
+# For FC2
+    tmux a -t FC2
+    module purge
+    module load java/openjdk-11.0.2
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    cd /scratch.global/diazo005/NN14/NN14_FBA69890_2026-01-22/ # this folder is in accordantes with the Flow cell name "FBA69890"
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq FC2/20260122_1401_X2_FBA69890_173562b5/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC2.log 2>&1 
+# For FC3
+    tmux a -t FC3
+    module purge
+    module load java/openjdk-11.0.2
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    cd /scratch.global/diazo005/NN14/NN14_FBA77955_2026-01-26/ # this folder is in accordantes with the Flow cell name "FBA77955"
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq no_sample_id/20260126_1931_X1_FBA77955_b23aacbb/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC3.log 2>&1 
+# For FC4
+    tmux a -t FC4
+    module purge
+    module load java/openjdk-11.0.2
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    cd /scratch.global/diazo005/NN14/NN14_FBA24108_2026-01-26/ # this folder is in accordantes with the Flow cell name "FBA24108"
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq FC04/20260126_1953_X2_FBA24108_f3a60a66/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC4.log 2>&1 
+# For FC5
+    tmux a -t FC5
+    module purge
+    module load java/openjdk-11.0.2
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    cd /scratch.global/diazo005/NN14/NN14_FBA78738_2026-01-27/ # this folder is in accordantes with the Flow cell name "FBA78738"
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq FC05/20260127_1515_X3_FBA78738_318950e2/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC5.log 2>&1 
+# For FC6
+    tmux a -t FC6
+    module purge
+    module load java/openjdk-11.0.2
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    cd /scratch.global/diazo005/NN14/NN14_FBA69924_2026-01-27/ # this folder is in accordantes with the Flow cell name "FBA69924"
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq FC06/20260127_1533_X4_FBA69924_861c2fb4/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC6.log 2>&1 
+# For FC7
+    tmux a -t FC7
+    module purge
+    module load java/openjdk-11.0.2
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    cd /scratch.global/diazo005/NN14/NN14_FBA65492_2026-01-28/ # this folder is in accordantes with the Flow cell name "FBA65492"
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq FC07/20260128_1445_X1_FBA65492_99ee3b09/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC7.log 2>&1 
+# For FC8
+    tmux a -t FC8
+    module purge
+    module load java/openjdk-11.0.2
+    PATH=$PATH:/projects/standard/noyes046/shared/tools
+    cd /scratch.global/diazo005/NN14/NN14_FBA69804_2026-01-28/ # this folder is in accordantes with the Flow cell name "FBA69804"
+    nextflow run epi2me-labs/wf-16s -profile singularity -r v1.2.0 --fastq FC08/20260128_1501_X2_FBA69804_5a8f9bf2/fastq_pass --classifier minimap2 --threads 10 --database_set SILVA_138_1 --analyse_unclassified True --minimap2_by_reference True >> 16S_FC8.log 2>&1 
+#
+#
+##
+###
+#### BASECALLING + DEMULTIPLEXING + TRIMMING (Primer, adapter & barcodes)
+###
+##
+#
+# Move to new node
+    ssh acn150
+# Create tmux 
+    tmux new -s swine 
+# Dorado is already a module in MSI so no need for INSTALLATION. Just load the module
+    module load dorado/1.3.0
+# we need to download the basecalling model that we will use. Since our kit is SQK-16S114.24 and we used an r10 flowcell, we will use the most updated and the most accurate model: dna_r10.4.1_e8.2_400bps_sup@v5.2.0
+    cd /scratch.global/diazo005
+    mkdir bc_models
+    dorado download --model dna_r10.4.1_e8.2_400bps_sup@v5.2.0 --directory bc_models >> download_model.log 2>&1
+# The pod5 files inputs are located at
+    # /scratch.global/diazo005/NN14
+# I have to make the directory to store the output files
+    cd /scratch.global/diazo005/NN14
+    mkdir dorado_FBA61501 dorado_FBA24108 dorado_FBA65492 dorado_FBA69804 dorado_FBA69890 dorado_FBA69924 dorado_FBA77955 dorado_FBA78738
+# Note that I left trimming option as default, so primers, adapters and barcodes will be trimmed
+# If adapter/primer trimming is done while basecalling in combination with demultiplexing, then Dorado will ensure that the trimming of adapters and primers does not interfere with the demultiplexing process.
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA61501:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA61501.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA61501
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA61501.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA61501.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_2026-01-22_FBA61501 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA61501
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA61501.slurm
+# and wait to see whether it fails or went through. You will receive and email but you can check your queue with:
+    squeue --me
+#
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA24108:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA24108.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA24108
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA24108.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA24108.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_FBA24108_2026-01-26 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA24108
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA24108.slurm
+#
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA65492:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA65492.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA65492
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA65492.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA65492.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_FBA65492_2026-01-28 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA65492
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA65492.slurm
+#
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA69804:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA69804.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA69804
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA69804.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA69804.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_FBA69804_2026-01-28 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA69804
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA69804.slurm
+#
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA69890:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA69890.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA69890
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA69890.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA69890.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_FBA69890_2026-01-22 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA69890
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA69890.slurm
+#
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA69924:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA69924.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA69924
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA69924.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA69924.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_FBA69924_2026-01-27 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA69924
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA69924.slurm
+#
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA77955:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA77955.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA77955
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA77955.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA77955.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_FBA77955_2026-01-26 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA77955
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA77955.slurm
+#
+#
+#
+##
+### Create a sbatch script to run a slurm job for flowcell FBA78738:
+##
+#
+# 
+    cd /scratch.global/diazo005/NN14
+    nano dorado_FBA78738.slurm
+# Write the following and save changes:
+
+#!/bin/bash -l
+
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=64gb
+#SBATCH --tmp=100gb
+#SBATCH -p a100-4
+#SBATCH --gres=gpu:a100:1
+#SBATCH --mail-user=diazo005@umn.edu
+#SBATCH --mail-type=all
+#SBATCH --job-name dorado_FBA78738
+#SBATCH -o /scratch.global/diazo005/NN14_2026_01_22/%j_FBA78738.out
+#SBATCH -e /scratch.global/diazo005/NN14_2026_01_22/%j_FBA78738.err
+
+set -e
+
+module load dorado/1.3.0
+
+dorado basecaller \
+/scratch.global/diazo005/bc_models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 \
+/scratch.global/diazo005/NN14/NN14_FBA78738_2026-01-27 \
+--verbose \
+--kit-name SQK-16S114-24 \
+--emit-fastq \
+--recursive \
+--output-dir dorado_FBA78738
+
+
+# Then submit the job to slurm 
+    sbatch dorado_FBA78738.slurm
+
+#
+#
+##
+###
+#### Plotting and reporting QC summaries with Nanoplot (v1.41.6) and MultiQC (v1.32)
+###
+##
+#
+# The fastq_pass folder outputed by dorado basecaller is located in every flowcell folder, and each of these folders are in a single place, along with the slurm job scripts and the std err files (logs):
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22
+# load Nanoplot & MultiQC
+    module load nanoplot/1.41.6
+    module load multiqc
+# For flowcell FBA24108:
+    tmux new -s n1
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA24108
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA24108
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+# For flowcell FBA61501:
+    tmux new -s n2
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA61501
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA61501
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+# For flowcell FBA65492:
+    tmux new -s n3
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA65492
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA65492
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+# For flowcell FBA69804:
+    tmux new -s n4
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA69804
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA69804
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+# For flowcell FBA69890:
+    tmux new -s n5
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA69890
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA69890
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+# For flowcell FBA69924:
+    tmux new -s n6
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA69924
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA69924
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+# For flowcell FBA77955:
+    tmux new -s n7
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA77955
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA77955
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+# For flowcell FBA78738:
+    tmux new -s n8
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA78738
+    mkdir nanoplot
+
+    for fq in fastq_pass/*/*.fastq
+    do
+        barcode=$(basename $(dirname "$fq"))
+        NanoPlot \
+            --fastq "$fq" \
+            --plots dot \
+            --loglength \
+            --outdir "nanoplot/$barcode" \
+            --threads 10 \
+            --N50
+    done
+# It will produce an output in the folder nanoplot, in which you'll find barcodeXX folders. Inside each barcode folder you will find several files.
+# The most important file among them is NanoPlot-report.html, which is a summary of all stats for reads in that barcode 
+# Then for multiQC:
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/dorado_FBA78738
+    mkdir multiqc
+    multiqc nanoplot -o multiqc -d -dd 1 --ignore "*post_filtering*"
+#
+#
+#
+##
+###
+#### Filter based on quality score and sequence length with Chopper (v0.13.0)
+###
+##
+#
+# Reference: https://github.com/wdecoster/chopper 
+#
+# INSTALLATION & LOADING
+    # Chopper Installation 
+    conda create -n chopper -c bioconda -c conda-forge chopper
+    # creating tmux session
+    tmux new -s chopper2
+    # Activate Chopper
+    conda activate chopper
+
+# RUNNING chopper (in a while loop)
+# I will run chopper in mass. So I will go to the flow cell directory and then run a script to automatically 
+# find fastq files, run chopper on them, modify their names adding "filtered" and output them into a "filtered" folder
+# It will also print a log file with the number of reads that were filter from the original number of reads for every fastq file
+
+cd /scratch.global/diazo005/dorado_NN14_2026_01_22
+
+# Run
+find . -type f -name "*.fastq" | while read -r fq; do
+    dorado=$(echo "$fq" | awk -F/ '{for(i=1;i<=NF;i++) if($i ~ /^dorado_FBA/) {print $i; exit}}')
+    outdir="filtered_${dorado}"
+    mkdir -p "$outdir"
+
+    base=$(basename "$fq" .fastq)
+    echo "Processing: $base"
+
+    chopper \
+        --threads 40 \
+        --quality 12 \
+        --minlength 1200 \
+        --maxlength 1800 \
+        --input "$fq" \
+        > "${outdir}/${base}_filtered.fastq"
+
+done 2>&1 | tee chopper_filtering.log
+
+#
+##
+###
+#### RUN EMU USIN HIGH-QUALITY DATA (GENERATED USING SUP BASECALLING MODEL AND QUALITY & LENGTH FILTERED) #########
+###
+##
+#
+# Reference: https://github.com/treangenlab/emu
+#
+# move to working directory
+    mkdir emu 
+    cd /scratch.global/diazo005/emu
+# Install emu as mamba environment
+    module load python3
+	conda create -n emu
+    conda activate emu
+    conda config --add channels defaults
+    conda config --add channels bioconda
+    conda config --add channels conda-forge
+    conda install emu
+# Manually download database: go to https://osf.io/56uf7/
+# Download file
+    emu-prebuilt/emu.tar
+# then use sftp protocol to transfer the file emu.tar (89.4 MB) to your working directory
+# sitting in your working directory
+    cd /scratch.global/diazo005/emu
+# you should be able to look the 'emu.tar' file. Then:
+    tar -xvf emu.tar
+# You need to specify the path to database as a variable name that emu can use later when running: 
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu
+# clone the full 'emu' repository from github to access the 'example' folder that contains the fasta sequence to run the demo
+    cd /scratch.global/diazo005/emu
+    git clone https://github.com/treangenlab/emu
+#
+# Now lets run EMU in a parallel way with different tmux sessions
+##### FOR FC1
+# create tmux 
+    tmux new -s emu1
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC1
+    cd /scratch.global/diazo005/emu/FC1
+# RUN EMU in a loop for all the barcode concatenated fastq files from Flow cell 01
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA61501/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC01.log 2>&1
+
+##### FOR FC02
+# create tmux 
+    tmux new -s emu2
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC2
+    cd /scratch.global/diazo005/emu/FC2
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 02
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA69890/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC02.log 2>&1
+
+##### FOR FC03
+# create tmux 
+    tmux new -s emu3
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC3
+    cd /scratch.global/diazo005/emu/FC3
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 03
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA77955/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC03.log 2>&1
+
+##### FOR FC04
+# create tmux 
+    tmux new -s emu4
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC4
+    cd /scratch.global/diazo005/emu/FC4
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 04
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA24108/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC04.log 2>&1
+
+##### FOR FC05
+# create tmux 
+    tmux new -s emu5
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC5
+    cd /scratch.global/diazo005/emu/FC5
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 04
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA78738/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC05.log 2>&1
+
+##### FOR FC06
+# create tmux 
+    tmux new -s emu6
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC6
+    cd /scratch.global/diazo005/emu/FC6
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 04
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA69924/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC06.log 2>&1
+
+##### FOR FC07
+# create tmux 
+    tmux new -s emu7
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC7
+    cd /scratch.global/diazo005/emu/FC7
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 04
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA65492/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC07.log 2>&1
+
+##### FOR FC08
+# create tmux 
+    tmux new -s emu8
+# load emu environment
+    conda activate emu
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/emu/database
+# Create directory to save results
+    mkdir FC8
+    cd /scratch.global/diazo005/emu/FC8
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 04
+for file in /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA69804/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 10 \
+        --output-dir "$base_name"
+done >> emu_FC08.log 2>&1
+
+##### FOR POSITIVE CONTROLS
+# BUILDING A CUSTOM DATABASE WITH ZymoBIOMICS 16S SEQUENCES
+# get ZymoBIOMICS 16S genes database and move it to the server
+# Address where ref genomes fasta files for ZymoBIOMICS Log distribution control (cat. D6310) can be found in the protocol:
+# https://files.zymoresearch.com/protocols/_d6310_zymobiomics_microbial_community_standard_ii_(log_distribution).pdf
+# After copying to the server only the folder ssrRNAs, we have to follow steps to build a custom database
+# 0. obtain tax IDs: That can be done manually in taxonomy ncbi
+# 1. make seq2tax.map file
+    cd /scratch.global/diazo005/dorado_controls/Zymo16S_db
+    # obtain sequence headers
+    grep -h "^>" *.fasta | sed 's/^>//' > sequence_headers.txt
+    # add the tax ids to the left and save as tsv
+    awk 'BEGIN{OFS="\t"}
+    /^Bacillus_/      {print $0, 1423; next}
+    /^Cryptococcus_/  {print $0, 5207; next}
+    /^Enterococcus_/  {print $0, 1351; next}
+    /^Escherichia_/  {print $0, 562; next}
+    /^Lactobacillus_/  {print $0, 1613; next}
+    /^Listeria_/  {print $0, 1639; next}
+    /^Pseudomonas_/  {print $0, 287; next}
+    /^Saccharomyces_/  {print $0, 4932; next}
+    /^Salmonella_/  {print $0, 28901; next}
+    /^Staphylococcus_/  {print $0, 1280; next}
+    {print $0, "NA"}' sequence_headers.txt > seq2tax.map.tsv
+# 2. make taxonomy.tsv file: I just made it manually in excel and save it as csv. Then moved to the server with sftp
+# I had to convert it from csv to tsv in the server
+    tr ',' '\t' < taxonomy.csv > taxonomy.tsv
+# 3. Concat all fasta SEQUENCES
+    cd /scratch.global/diazo005/dorado_controls/Zymo16S_db
+    cat *.fasta > Zymo16S_db.fasta
+# 4. Build database
+    conda activate emu
+    emu build-database Zymo16S_db --sequences Zymo16S_db.fasta --seq2tax seq2tax.map.tsv --taxonomy-list taxonomy.tsv
+# 5. A folder Zymo16S_db was created with the files that emu use as database: species_taxid.fasta, taxonomy.tsv
+#
+# RUN EMU WITH CUSTOM DATABASE FOR ZymoBIOMICS cat. D6310 controls
+# 
+# Identify the positive controls and move to a new specific directory
+# Mock1: FC07_barcode23.fastq 
+# Mock2: FC07_barcode24.fastq
+# FC07 is flow cell FBA65492
+# Copy the files to a folder for controls
+    cd /scratch.global/diazo005/
+    mkdir dorado_controls
+    cd /scratch.global/diazo005/dorado_NN14_2026_01_22/filtered_dorado_FBA65492
+    cp FBA65492_pass_barcode23_99ee3b09_4dcb7617_0_filtered.fastq FBA65492_pass_barcode24_99ee3b09_4dcb7617_0_filtered.fastq /scratch.global/diazo005/dorado_controls
+    cd /scratch.global/diazo005/dorado_controls
+# create tmux
+    ssh acn150
+    tmux new -s controls
+# load emu environment
+    conda activate emu
+    # The database files are stored here: /scratch.global/diazo005/dorado_controls/Zymo16S_db/Zymo16S_db
+    export EMU_DATABASE_DIR=/scratch.global/diazo005/dorado_controls/Zymo16S_db/Zymo16S_db
+# Create directory to save results
+    mkdir FC8
+    cd /scratch.global/diazo005/emu/FC8
+# RUN EMU in a loop for all the barcode concatenated fastq.gz files from Flow cell 04
+for file in /scratch.global/diazo005/dorado_controls/*.fastq; do
+    base_name=$(basename "$file" .fastq)
+    
+    emu abundance "$file" \
+        --output-unclassified \
+        --keep-counts \
+        --threads 20 \
+        --output-dir "$base_name"
+done >> emu_Mock_controls.log 2>&1
+
+#
+#
+# FINALLY, after running the 8 flow cells:
+# Change name to every tsv files to specify which Flow cell they came from
+    cd /scratch.global/diazo005/emu/FC1
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC01_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    cd /scratch.global/diazo005/emu/FC2
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC02_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    cd /scratch.global/diazo005/emu/FC3 
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC03_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    cd /scratch.global/diazo005/emu/FC4
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC04_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    cd /scratch.global/diazo005/emu/FC5
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC05_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    cd /scratch.global/diazo005/emu/FC6
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC06_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    cd /scratch.global/diazo005/emu/FC7
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC07_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    cd /scratch.global/diazo005/emu/FC8
+    # Copying all the files to a single place
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    # modifying their names to have barcode and flowcell number
+    for file in *_rel-abundance.tsv; do
+    [[ $file =~ (barcode[0-9]+|unclassified) ]] || continue
+    mv "$file" "FC08_${BASH_REMATCH[1]}_rel-abundance.tsv"
+    done
+
+    # moving all *_rel-abundance.tsv outputs to a single folder to combine them all
+    cd /scratch.global/diazo005/emu
+    for folder in */; do cp "$folder"*_rel-abundance.tsv .; done
+    mkdir swine
+    mv *.tsv swine    
+
+# Combine all tsv results, EXCEPT FOR POSITIVE CONTROLS, in a single TSV file 
+    cd /scratch.global/diazo005/emu/swine
+    Remove positive controls
+    rm FC07_barcode23_rel-abundance.tsv FC07_barcode24_rel-abundance.tsv
+    # If not active, remember to activate emu environment in conda: 
+    conda activate emu
+    emu combine-outputs --counts . tax_id
+    # you will get a file called "emu-combined-tax_id-counts.tsv"
+    # I got the file but also got this error:
+        # /users/7/diazo005/.conda/envs/emu/bin/emu:821: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+        # df_combined_full = df_combined_full.set_index(rank).sort_index().reset_index()
+        # Combined table generated: ./emu-combined-tax_id-counts.tsv
+# COMBINE POSITIVE CONTROLS
+    cd /scratch.global/diazo005/dorado_controls
+    mkdir pos_controls
+    # Copying files to directory
+    cp FBA65492_pass_barcode23_99ee3b09_4dcb7617_0_filtered/FBA65492_pass_barcode23_99ee3b09_4dcb7617_0_filtered_rel-abundance.tsv pos_controls
+    cp FBA65492_pass_barcode24_99ee3b09_4dcb7617_0_filtered/FBA65492_pass_barcode24_99ee3b09_4dcb7617_0_filtered_rel-abundance.tsv pos_controls
+    mv FBA65492_pass_barcode23_99ee3b09_4dcb7617_0_filtered_rel-abundance.tsv FC07_barcode23_rel-abundance.tsv
+    mv FBA65492_pass_barcode24_99ee3b09_4dcb7617_0_filtered_rel-abundance.tsv FC07_barcode24_rel-abundance.tsv
+    # If not active, remember to activate emu environment in conda: 
+    conda activate emu
+    emu combine-outputs --counts . tax_id
+    # you will get a file called "emu-combined-tax_id-counts.tsv"
+    # Change name of files to avoid duplication with main results file
+    mv emu-combined-tax_id-counts.tsv emu-combined-positive_controls-counts.tsv
+    mv emu-combined-tax_id.tsv emu-combined-positive_controls.tsv
+# Move all files to local machine using sftp protocol
